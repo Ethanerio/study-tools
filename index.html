@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Research Portal</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial,Helvetica,sans-serif;
+margin:0;
+background:#0f172a;
+color:white;
+}
+
+header{
+background:#020617;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+box-shadow:0 2px 10px rgba(0,0,0,0.6);
+}
+
+header h1{
+font-size:18px;
+margin:0;
+}
+
+button{
+background:#3b82f6;
+border:none;
+padding:10px 14px;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+button:hover{
+background:#2563eb;
+}
+
+#gameList{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+gap:20px;
+padding:25px;
+}
+
+.gameCard{
+background:#1e293b;
+border-radius:12px;
+overflow:hidden;
+cursor:pointer;
+transition:0.2s;
+}
+
+.gameCard:hover{
+transform:scale(1.05);
+}
+
+.gameCard img{
+width:100%;
+height:140px;
+object-fit:cover;
+}
+
+.gameCard h3{
+margin:10px;
+font-size:16px;
+}
+
+#playerPage{
+display:none;
+height:100vh;
+flex-direction:column;
+}
+
+#gameFrame{
+flex:1;
+border:none;
+width:100%;
+}
+
+#backBtn{
+margin:10px;
+}
+
+#search{
+padding:10px;
+border-radius:6px;
+border:none;
+width:200px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Educational Research Database</h1>
+
+<input id="search" placeholder="Search database">
+</header>
+
+<div id="libraryPage">
+<div id="gameList"></div>
+</div>
+
+<div id="playerPage">
+<button id="backBtn">← Back to Library</button>
+<iframe id="gameFrame"></iframe>
+</div>
+
+<script>
+
+const gameList = document.getElementById("gameList")
+const playerPage = document.getElementById("playerPage")
+const libraryPage = document.getElementById("libraryPage")
+const frame = document.getElementById("gameFrame")
+const search = document.getElementById("search")
+
+let games = []
+
+fetch("https://raw.githubusercontent.com/swarmintelli/Unblocked-Games-CDN/main/games.json")
+.then(res=>res.json())
+.then(data=>{
+
+games = data
+
+renderGames(games)
+
+})
+
+function renderGames(list){
+
+gameList.innerHTML=""
+
+list.forEach(game=>{
+
+let card = document.createElement("div")
+card.className="gameCard"
+
+card.innerHTML=`
+<img src="${game.game_image_icon}">
+<h3>${game.name}</h3>
+`
+
+card.onclick=()=>{
+
+openGame(game)
+
+}
+
+gameList.appendChild(card)
+
+})
+
+}
+
+function openGame(game){
+
+libraryPage.style.display="none"
+playerPage.style.display="flex"
+
+frame.srcdoc = game.iframe
+
+}
+
+document.getElementById("backBtn").onclick=()=>{
+
+frame.src=""
+playerPage.style.display="none"
+libraryPage.style.display="block"
+
+}
+
+search.addEventListener("input",()=>{
+
+let val = search.value.toLowerCase()
+
+let filtered = games.filter(g=>
+g.name.toLowerCase().includes(val)
+)
+
+renderGames(filtered)
+
+})
+
+</script>
+
+</body>
+</html>
